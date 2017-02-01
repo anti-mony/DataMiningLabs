@@ -1,0 +1,6 @@
+5
+ABCDE
+ACD
+ABF
+BCD
+CEF
