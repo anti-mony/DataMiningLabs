@@ -1,6 +1,5 @@
-5
-ABCDE
-ACD
-ABF
-BCD
-CEF
+4
+ABCD
+ACB
+CB
+E

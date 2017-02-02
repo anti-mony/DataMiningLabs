@@ -2,6 +2,7 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.HashMap;
 import java.util.InputMismatchException;
 import java.util.Scanner;
 
@@ -14,9 +15,12 @@ public class AssociationRuleMining {
 
     private int minThresh;
     private int numberOfTransactions;
+    private int biggestTransaction;
     private Character[][] transactions;
+    private HashMap<Character, Integer> hMap;
 
     public static void main(String[] args) {
+        double start = 0, end;
 //        System.out.println(System.getProperty("user.dir"));
         String fileName;
         boolean check = true;
@@ -39,6 +43,7 @@ public class AssociationRuleMining {
                 System.out.print("Enter file name: ");
                 fileName = bR.readLine();
 //                System.out.println(fileName);
+                start = System.nanoTime();
                 aRM.readInput(fileName);
                 check = true;
             } catch (IOException E) {
@@ -46,10 +51,19 @@ public class AssociationRuleMining {
             }
         }
         aRM.printInput();
+        aRM.dataMine();
+        end = System.nanoTime();
+        System.out.println("Time taken to execute the program: " + (end - start) / 1000000 + " milliseconds");
+        System.out.println(aRM.gethMap());
+        System.out.println("Memory Used: " + (Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) / (1024) + " KB");
     }
 
     private void setMinThresh(int minThresh) {
         this.minThresh = minThresh;
+    }
+
+    HashMap<Character, Integer> gethMap() {
+        return hMap;
     }
 
     private void readInput(String fileName) throws IOException {
@@ -64,6 +78,8 @@ public class AssociationRuleMining {
         transactions = new Character[numberOfTransactions][];
         while ((tmp = bfR.readLine()) != null) {
             //System.out.println("Tmp: "+tmp);
+            if (tmp.length() > biggestTransaction)
+                biggestTransaction = tmp.length();
             transactions[i] = new Character[tmp.length()];
             charArray = tmp.toCharArray();
             for (j = 0; j < tmp.length(); j++) {
@@ -84,4 +100,21 @@ public class AssociationRuleMining {
             System.out.println();
         }
     }
+
+    private void dataMine() {
+        hMap = new HashMap<>();
+        for (int k = 0; k < biggestTransaction; k++) {
+            for (int i = 0; i < numberOfTransactions; i++) {
+                for (int j = 0; j < transactions[i].length; j++) {
+                    if (hMap.containsKey(transactions[i][j])) {
+                        hMap.put(transactions[i][j], hMap.get(transactions[i][j]) + 1);
+                    } else {
+                        hMap.put(transactions[i][j], 1);
+                    }
+                }
+            }
+            break;
+        }
+    }
+
 }
