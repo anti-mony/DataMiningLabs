@@ -2,9 +2,7 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.HashMap;
-import java.util.InputMismatchException;
-import java.util.Scanner;
+import java.util.*;
 
 /**
  * Created by Sushant Bansal, Pragya Chaturvedi, Ishan Tyagi
@@ -18,6 +16,9 @@ public class AssociationRuleMining {
     private int biggestTransaction;
     private Character[][] transactions;
     private HashMap<Character, Integer> hMap;
+    private HashMap<Character, Integer> priorHashMap = new HashMap<>();
+    private HashMap<Character, Integer> laterHashMap = new HashMap<>();
+
 
     public static void main(String[] args) {
         double start = 0, end;
@@ -50,8 +51,8 @@ public class AssociationRuleMining {
                 System.out.println("Bad Input File, please enter the file name again! ");
             }
         }
-        aRM.printInput();
-        aRM.dataMine();
+        //aRM.printInput();
+        //aRM.dataMine();
         end = System.nanoTime();
         System.out.println("Time taken to execute the program: " + (end - start) / 1000000 + " milliseconds");
         System.out.println(aRM.gethMap());
@@ -88,6 +89,34 @@ public class AssociationRuleMining {
             }
             i++;
         }
+
+        Set<Character> candidateSet = new HashSet<>();
+
+        for(int m=0; m < transactions.length; m++){
+            for (int n=0; n < transactions[m].length; n++){
+                candidateSet.add(transactions[m][n]);
+            }
+
+        }
+        bfR.close();
+        System.out.println("Candidate set: " + candidateSet);
+
+
+        for (i = 0; i < transactions.length; i++) {
+            for (j = 0; j < transactions[i].length; j++) {
+                    if (priorHashMap.containsKey(transactions[i][j])){
+                        priorHashMap.put(transactions[i][j],priorHashMap.get(transactions[i][j]) + 1);
+                    }
+                    else{
+                        //System.out.println("else:" +temp);
+                        priorHashMap.put(transactions[i][j],1);
+                    }
+            }
+        }
+        System.out.println("Prior hashmap:" +priorHashMap);
+        pruneAlgorithm();
+        associationRuleMining();
+
     }
 
     private void printInput() {
@@ -101,20 +130,16 @@ public class AssociationRuleMining {
         }
     }
 
-    private void dataMine() {
-        hMap = new HashMap<>();
-        for (int k = 0; k < biggestTransaction; k++) {
-            for (int i = 0; i < numberOfTransactions; i++) {
-                for (int j = 0; j < transactions[i].length; j++) {
-                    if (hMap.containsKey(transactions[i][j])) {
-                        hMap.put(transactions[i][j], hMap.get(transactions[i][j]) + 1);
-                    } else {
-                        hMap.put(transactions[i][j], 1);
-                    }
-                }
-            }
-            break;
-        }
+
+
+    private void pruneAlgorithm(){
+
     }
+
+    private void associationRuleMining(){
+
+    }
+
+
 
 }
