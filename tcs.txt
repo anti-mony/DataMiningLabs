@@ -1,5 +1,5 @@
 4
-ABCD
-ACB
-CB
-E
+ABCDE
+ACBC
+CBB
+EEB

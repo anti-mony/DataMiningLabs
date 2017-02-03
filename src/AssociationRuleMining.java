@@ -2,7 +2,10 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.*;
+import java.util.HashMap;
+import java.util.InputMismatchException;
+import java.util.Iterator;
+import java.util.Scanner;
 
 /**
  * Created by Sushant Bansal, Pragya Chaturvedi, Ishan Tyagi
@@ -15,10 +18,8 @@ public class AssociationRuleMining {
     private int numberOfTransactions;
     private int biggestTransaction;
     private Character[][] transactions;
-    private HashMap<Character, Integer> hMap;
     private HashMap<Character, Integer> priorHashMap = new HashMap<>();
     private HashMap<Character, Integer> laterHashMap = new HashMap<>();
-
 
     public static void main(String[] args) {
         double start = 0, end;
@@ -51,20 +52,15 @@ public class AssociationRuleMining {
                 System.out.println("Bad Input File, please enter the file name again! ");
             }
         }
+        aRM.frequencyCalculate();
         //aRM.printInput();
-        //aRM.dataMine();
         end = System.nanoTime();
         System.out.println("Time taken to execute the program: " + (end - start) / 1000000 + " milliseconds");
-        System.out.println(aRM.gethMap());
         System.out.println("Memory Used: " + (Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) / (1024) + " KB");
     }
 
     private void setMinThresh(int minThresh) {
         this.minThresh = minThresh;
-    }
-
-    HashMap<Character, Integer> gethMap() {
-        return hMap;
     }
 
     private void readInput(String fileName) throws IOException {
@@ -89,34 +85,22 @@ public class AssociationRuleMining {
             }
             i++;
         }
-
-        Set<Character> candidateSet = new HashSet<>();
-
-        for(int m=0; m < transactions.length; m++){
-            for (int n=0; n < transactions[m].length; n++){
-                candidateSet.add(transactions[m][n]);
-            }
-
-        }
         bfR.close();
-        System.out.println("Candidate set: " + candidateSet);
-
-
-        for (i = 0; i < transactions.length; i++) {
-            for (j = 0; j < transactions[i].length; j++) {
-                    if (priorHashMap.containsKey(transactions[i][j])){
-                        priorHashMap.put(transactions[i][j],priorHashMap.get(transactions[i][j]) + 1);
-                    }
-                    else{
-                        //System.out.println("else:" +temp);
-                        priorHashMap.put(transactions[i][j],1);
-                    }
+    }
+    private void frequencyCalculate(){
+            for (int i = 0; i < transactions.length; i++) {
+                for (int j = 0; j < transactions[i].length; j++) {
+                        if (priorHashMap.containsKey(transactions[i][j])){
+                            priorHashMap.put(transactions[i][j],priorHashMap.get(transactions[i][j]) + 1);
+                        }
+                        else{
+                            //System.out.println("else:" +temp);
+                            priorHashMap.put(transactions[i][j],1);
+                        }
+                }
             }
-        }
-        System.out.println("Prior hashmap:" +priorHashMap);
-        pruneAlgorithm();
-        associationRuleMining();
-
+            System.out.println("Prior hashmap:" +priorHashMap);
+            pruneAlgorithm();
     }
 
     private void printInput() {
@@ -130,16 +114,22 @@ public class AssociationRuleMining {
         }
     }
 
-
-
     private void pruneAlgorithm(){
-
+        Iterator initIterator = priorHashMap.keySet().iterator();
+        char temp;
+        int val;
+        while(initIterator.hasNext()){
+            temp = (Character)initIterator.next();
+            val = priorHashMap.get(temp);
+            //System.out.println("Val: "+val);
+            if(val >= minThresh){
+                laterHashMap.put(temp,val);
+            }
+        }
+        System.out.println("LaterHashMap: "+laterHashMap);
     }
 
     private void associationRuleMining(){
 
     }
-
-
-
 }
