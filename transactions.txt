@@ -1,6 +1,4 @@
-5
-ABCDE
-CD
-ABF
-BCD
-EF
+3
+AC
+DE
+CBA
