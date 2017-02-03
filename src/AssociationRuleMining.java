@@ -2,10 +2,7 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.HashMap;
-import java.util.InputMismatchException;
-import java.util.Iterator;
-import java.util.Scanner;
+import java.util.*;
 
 /**
  * Created by Sushant Bansal, Pragya Chaturvedi, Ishan Tyagi
@@ -114,6 +111,8 @@ public class AssociationRuleMining {
         }
     }
 
+
+
     private void pruneAlgorithm(){
         Iterator initIterator = priorHashMap.keySet().iterator();
         char temp;
@@ -132,4 +131,7 @@ public class AssociationRuleMining {
     private void associationRuleMining(){
 
     }
+
+
+
 }
