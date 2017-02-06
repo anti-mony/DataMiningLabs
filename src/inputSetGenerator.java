@@ -5,13 +5,14 @@ import java.util.Random;
 
 /**
  * Created by Sushant Bansal, Pragya Chaturvedi & Ishan Tyagi on 2/6/2017.
+ * Input Generator for Association Rule Mining Algorithm
  */
 public class inputSetGenerator {
     private static FileWriter fileW;
     private static BufferedWriter bufferW;
 
     public static void main(String[] args) {
-        int noOfInputs = 10000;
+        int noOfInputs = 100;
         try {
             fileW = new FileWriter("retail.txt");
             bufferW = new BufferedWriter(fileW);

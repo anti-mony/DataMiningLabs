@@ -1,7 +1,4 @@
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.util.*;
 
 /**
@@ -42,11 +39,12 @@ public class AssociationRuleMining {
     private Set<kItemSet> priorSet = new HashSet<>();
     private Set<kItemSet> laterSet = new HashSet<>();
     private Set<Character> candidate_set = new HashSet<>();
-
+    private int outputToFile = 0;
 
     public static void main(String[] args) {
+        String outputCheck;
         double start = 0, end;
-        String fileName;
+        String fileName, outputFilename = "processed_retail.txt";
         boolean check = true;
         AssociationRuleMining aRM = new AssociationRuleMining();
         Scanner inputScanner = new Scanner(System.in);
@@ -65,9 +63,20 @@ public class AssociationRuleMining {
 
         while (!check) {
             try {
-                System.out.print("Enter file name: ");
+                System.out.print("Enter input file name: ");
                 fileName = bR.readLine();
-//                System.out.println(fileName);
+                System.out.print("Do you want to out in a file ? Y/N : ");
+                outputCheck = bR.readLine();
+                if (outputCheck.equals("Y") || outputCheck.equals("y")) {
+                    aRM.setOutputToFile(1);
+                    System.out.print("Enter output file name : ");
+                    outputFilename = bR.readLine();
+                    if (outputFilename.length() < 1)
+                        outputFilename = "processed_retail.txt";
+                    System.out.println("Writing output to: " + outputFilename);
+                } else {
+                    System.out.println("Printing output to console:");
+                }
                 start = System.nanoTime();
                 aRM.readInput(fileName);
                 check = true;
@@ -77,16 +86,38 @@ public class AssociationRuleMining {
         }
 
         aRM.fillPriorSet();
-//        aRM.printInput();
-        aRM.pruneAlgorithm();
-        aRM.generateFrequentItemsets();
+        try {
+            FileWriter writeToFile = new FileWriter(outputFilename);
+            BufferedWriter bWrite = new BufferedWriter(writeToFile);
+            if (aRM.getOutputToFile() == 1) {
+                bWrite.write("\n-----> INITIAL LIST <-----\n");
+                for (kItemSet t : aRM.getPriorSet()) {
+                    bWrite.write(t.itemset + " : " + t.support + "\n");
+                }
+            }
+            aRM.coupleAndCount(bWrite);
+        } catch (IOException E) {
+            System.out.println(E.toString());
+        }
         end = System.nanoTime();
-        System.out.println("Time taken to execute the program: " + (end - start) / 1000000000 + " seconds");
-        System.out.println("Memory Used: " + (Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) / (1024) + " KB");
+        System.out.println("\n** Time taken to execute the program: " + (end - start) / 1000000000 + " seconds **");
+        System.out.println("\n** Memory Used: " + (Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) / (1024) + " KB **");
     }
 
     private void setMinThresh(int minThresh) {
         this.minThresh = minThresh;
+    }
+
+    private void setOutputToFile(int outputToFile) {
+        this.outputToFile = outputToFile;
+    }
+
+    private Set<kItemSet> getPriorSet() {
+        return priorSet;
+    }
+
+    private int getOutputToFile() {
+        return outputToFile;
     }
 
     private void readInput(String fileName) throws IOException {
@@ -97,10 +128,8 @@ public class AssociationRuleMining {
         BufferedReader bfR = new BufferedReader(fRead);
         tmp = bfR.readLine();
         numberOfTransactions = Integer.parseInt(tmp);
-//        System.out.println("No:" + numberOfTransactions);
         transactions = new Character[numberOfTransactions][];
         while ((tmp = bfR.readLine()) != null) {
-            //System.out.println("Tmp: "+tmp);
             if (tmp.length() > biggestTransaction)
                 biggestTransaction = tmp.length();
             transactions[i] = new Character[tmp.length()];
@@ -108,7 +137,6 @@ public class AssociationRuleMining {
             for (j = 0; j < tmp.length(); j++) {
                 transactions[i][j] = charArray[j];
                 candidate_set.add(charArray[j]);
-//                System.out.print(" "+charArray[j]);
             }
             i++;
         }
@@ -126,30 +154,46 @@ public class AssociationRuleMining {
         }
     }
 
-    private void pruneAlgorithm() {
+    private void pruneAlgorithm(int i, BufferedWriter bW) throws IOException {
         laterSet.clear();
         for (kItemSet t : priorSet) {
             if (t.support >= minThresh) {
                 laterSet.add(t);
             }
         }
-        System.out.println("\n=+= PASS Results =+=");
-        if (laterSet.isEmpty()) {
-            System.out.println("No item-sets present after this pass \n");
-            System.out.println("------------> EXITING <------------");
+        if (outputToFile == 1) {
+//            bW.flush();
+            bW.write("\n-----> PASS " + i + " Results <-----\n");
+            if (laterSet.isEmpty()) {
+//                bW.flush();
+                bW.write("No item-sets present after this pass \n");
+//                bW.write("\n------------> Completed <------------\n");
+            } else {
+                for (kItemSet t : laterSet) {
+                    bW.write(t.itemset + " : " + t.support + "\n");
+                }
+            }
         } else {
-            for (kItemSet t : laterSet) {
-                System.out.println(t.itemset + " : " + t.support);
+            System.out.println("\n=+= PASS " + i + " Results =+=");
+            if (laterSet.isEmpty()) {
+                System.out.println("No item-sets present after this pass \n");
+                System.out.println("------------> Completed <------------");
+            } else {
+                for (kItemSet t : laterSet) {
+                    System.out.println(t.itemset + " : " + t.support);
+                }
             }
         }
     }
 
-    private void generateFrequentItemsets() {
+    private void coupleAndCount(BufferedWriter bW) throws IOException {
+        int passNumber = 0;
         boolean toBeContinued = true;
         char element;
         int size = 1;
         Set<Set<Character>> candidates = new HashSet<>();
-
+        pruneAlgorithm(++passNumber, bW);
+        bW.flush();
         while (toBeContinued) {
             candidates.clear();
             priorSet.clear();
@@ -166,34 +210,27 @@ public class AssociationRuleMining {
             while (iterator.hasNext()) {
                 t1 = iterator.next();
                 temp = t1.itemset;
-//                System.out.println("T1 Outer Loop, Temp(Character Set):"+ temp);
                 it2 = laterSet.iterator();
                 while (it2.hasNext()) {
                     t2 = it2.next();
-//                    System.out.println("1st Inside Loop Iterator on L, kItemSet t2: "+ t2);
                     it3 = t2.itemset.iterator();
                     while (it3.hasNext()) {
                         try {
-//                            System.out.println("2nd Inside Loop , 3rd iterator on L");
                             element = it3.next();
-//                            System.out.println("Element: "+ element);
                         } catch (ConcurrentModificationException e) {
                             // Sometimes this Exception gets thrown, so simply break in that case.
                             break;
                         }
                         temp.add(element);
-//                        System.out.println("2nd Inside Loop, temp(Character Set): "+ temp);
                         if (temp.size() != size) {
                             int_arr = temp.toArray(new Character[0]);
                             temp2 = new HashSet<>();
                             for (Character x : int_arr) {
                                 temp2.add(x);
-//                                System.out.println("Hashset of Characters, Temp2: "+ temp2);
                             }
                             candidates.add(temp2);
                             temp.remove(element);
                         }
-//                        System.out.println("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
                     }
                 }
             }
@@ -204,16 +241,14 @@ public class AssociationRuleMining {
                 priorSet.add(new kItemSet(s, count(s)));
             }
 
-            pruneAlgorithm();
+            pruneAlgorithm(++passNumber, bW);
+            bW.flush();
             if (laterSet.size() <= 1) {
                 toBeContinued = false;
             }
             size++;
         }
-//        System.out.println("\n=+= FINAL LIST =+=");
-//        for(kItemSet t : laterSet) {
-//            System.out.println(t.itemset + " : " + t.support);
-//        }
+        bW.write("\n-----> Completed <-----");
     }
 
     private int count(Set<Character> inputSet) {
@@ -265,10 +300,13 @@ public class AssociationRuleMining {
             kItemSet t = new kItemSet(s, frequencyCount(tmp));
             priorSet.add(t);
         }
-        System.out.println("\n=+= INITIAL LIST =+=");
-        for (kItemSet t : priorSet) {
-            System.out.println(t.itemset + " : " + t.support);
+        if (outputToFile == 0) {
+            System.out.println("\n=+= INITIAL LIST =+=");
+            for (kItemSet t : priorSet) {
+                System.out.println(t.itemset + " : " + t.support);
+            }
         }
+
     }
 }
 
