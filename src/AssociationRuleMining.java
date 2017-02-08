@@ -69,7 +69,7 @@ public class AssociationRuleMining {
                 outputCheck = bR.readLine();
                 if (outputCheck.equals("Y") || outputCheck.equals("y")) {
                     aRM.setOutputToFile(1);
-                    System.out.print("Enter output file name : ");
+                    System.out.print("Enter output file name(Press enter for default) : ");
                     outputFilename = bR.readLine();
                     if (outputFilename.length() < 1)
                         outputFilename = "processed_retail.txt";
@@ -80,24 +80,31 @@ public class AssociationRuleMining {
                 start = System.nanoTime();
                 aRM.readInput(fileName);
                 check = true;
+                bR.close();
             } catch (IOException E) {
                 System.out.println("Bad Input File, please enter the file name again! ");
             }
         }
-
         aRM.fillPriorSet();
-        try {
-            FileWriter writeToFile = new FileWriter(outputFilename);
-            BufferedWriter bWrite = new BufferedWriter(writeToFile);
-            if (aRM.getOutputToFile() == 1) {
-                bWrite.write("\n-----> INITIAL LIST <-----\n");
-                for (kItemSet t : aRM.getPriorSet()) {
-                    bWrite.write(t.itemset + " : " + t.support + "\n");
+        if (aRM.getOutputToFile() == 1) {
+            try {
+                FileWriter writeToFile = new FileWriter(outputFilename);
+                BufferedWriter bWrite = new BufferedWriter(writeToFile);
+                if (aRM.getOutputToFile() == 1) {
+                    bWrite.write("\n-----> INITIAL LIST <-----\n");
+                    for (kItemSet t : aRM.getPriorSet()) {
+                        bWrite.write(t.itemset + " : " + t.support + "\n");
+                    }
                 }
+                bWrite.flush();
+                aRM.coupleAndCount(bWrite);
+                bWrite.close();
+            } catch (IOException E) {
+                System.out.println(E.toString());
+                System.out.println("Please restart the program again: ");
             }
-            aRM.coupleAndCount(bWrite);
-        } catch (IOException E) {
-            System.out.println(E.toString());
+        } else {
+            aRM.coupleAndCount();
         }
         end = System.nanoTime();
         System.out.println("\n** Time taken to execute the program: " + (end - start) / 1000000000 + " seconds **");
@@ -154,6 +161,24 @@ public class AssociationRuleMining {
         }
     }
 
+    private void pruneAlgorithm(int i) {
+        laterSet.clear();
+        for (kItemSet t : priorSet) {
+            if (t.support >= minThresh) {
+                laterSet.add(t);
+            }
+        }
+        System.out.println("\n=+= PASS " + i + " Results =+=");
+        if (laterSet.isEmpty()) {
+            System.out.println("No item-sets present after this pass \n");
+
+        } else {
+            for (kItemSet t : laterSet) {
+                System.out.println(t.itemset + " : " + t.support);
+            }
+        }
+    }
+
     private void pruneAlgorithm(int i, BufferedWriter bW) throws IOException {
         laterSet.clear();
         for (kItemSet t : priorSet) {
@@ -161,29 +186,16 @@ public class AssociationRuleMining {
                 laterSet.add(t);
             }
         }
-        if (outputToFile == 1) {
-//            bW.flush();
-            bW.write("\n-----> PASS " + i + " Results <-----\n");
-            if (laterSet.isEmpty()) {
-//                bW.flush();
-                bW.write("No item-sets present after this pass \n");
-//                bW.write("\n------------> Completed <------------\n");
-            } else {
-                for (kItemSet t : laterSet) {
-                    bW.write(t.itemset + " : " + t.support + "\n");
-                }
-            }
+        bW.write("\n-----> PASS " + i + " Results <-----\n");
+        if (laterSet.isEmpty()) {
+            bW.write("No item-sets qualify after this pass \n");
+//            bW.write("\n------------> Completed <------------\n");
         } else {
-            System.out.println("\n=+= PASS " + i + " Results =+=");
-            if (laterSet.isEmpty()) {
-                System.out.println("No item-sets present after this pass \n");
-                System.out.println("------------> Completed <------------");
-            } else {
-                for (kItemSet t : laterSet) {
-                    System.out.println(t.itemset + " : " + t.support);
-                }
+            for (kItemSet t : laterSet) {
+                bW.write(t.itemset + " : " + t.support + "\n");
             }
         }
+        bW.flush();
     }
 
     private void coupleAndCount(BufferedWriter bW) throws IOException {
@@ -193,7 +205,6 @@ public class AssociationRuleMining {
         int size = 1;
         Set<Set<Character>> candidates = new HashSet<>();
         pruneAlgorithm(++passNumber, bW);
-        bW.flush();
         while (toBeContinued) {
             candidates.clear();
             priorSet.clear();
@@ -242,13 +253,76 @@ public class AssociationRuleMining {
             }
 
             pruneAlgorithm(++passNumber, bW);
-            bW.flush();
             if (laterSet.size() <= 1) {
                 toBeContinued = false;
             }
             size++;
         }
         bW.write("\n-----> Completed <-----");
+        bW.flush();
+    }
+
+    private void coupleAndCount() {
+        int passNumber = 0;
+        boolean toBeContinued = true;
+        char element;
+        int size = 1;
+        Set<Set<Character>> candidates = new HashSet<>();
+        pruneAlgorithm(++passNumber);
+        while (toBeContinued) {
+            candidates.clear();
+            priorSet.clear();
+            kItemSet t1;
+            Set<Character> temp;
+            Iterator<kItemSet> it2;
+            kItemSet t2;
+            Iterator<Character> it3;
+            Character[] int_arr;
+            Set<Character> temp2;
+            Set<Character> s;
+            Iterator<Set<Character>> candidates_iterator;
+            Iterator<kItemSet> iterator = laterSet.iterator();
+            while (iterator.hasNext()) {
+                t1 = iterator.next();
+                temp = t1.itemset;
+                it2 = laterSet.iterator();
+                while (it2.hasNext()) {
+                    t2 = it2.next();
+                    it3 = t2.itemset.iterator();
+                    while (it3.hasNext()) {
+                        try {
+                            element = it3.next();
+                        } catch (ConcurrentModificationException e) {
+                            // Sometimes this Exception gets thrown, so simply break in that case.
+                            break;
+                        }
+                        temp.add(element);
+                        if (temp.size() != size) {
+                            int_arr = temp.toArray(new Character[0]);
+                            temp2 = new HashSet<>();
+                            for (Character x : int_arr) {
+                                temp2.add(x);
+                            }
+                            candidates.add(temp2);
+                            temp.remove(element);
+                        }
+                    }
+                }
+            }
+            candidates_iterator = candidates.iterator();
+            while (candidates_iterator.hasNext()) {
+                s = candidates_iterator.next();
+                // These lines cause warnings, as the candidate_set Set stores a raw set.
+                priorSet.add(new kItemSet(s, count(s)));
+            }
+
+            pruneAlgorithm(++passNumber);
+            if (laterSet.size() <= 1) {
+                toBeContinued = false;
+            }
+            size++;
+        }
+        System.out.println("\n-----> Completed <-----");
     }
 
     private int count(Set<Character> inputSet) {
@@ -301,7 +375,7 @@ public class AssociationRuleMining {
             priorSet.add(t);
         }
         if (outputToFile == 0) {
-            System.out.println("\n=+= INITIAL LIST =+=");
+            System.out.println("\n -----> INITIAL LIST <-----");
             for (kItemSet t : priorSet) {
                 System.out.println(t.itemset + " : " + t.support);
             }
