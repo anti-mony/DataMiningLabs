@@ -7,6 +7,10 @@ import java.util.*;
  *
  */
 
+/*
+ * Class to make a set of characters and
+ * support is the frequency
+ */
 class kItemSet {
     Set<Character> itemset;
     int support;
@@ -31,20 +35,24 @@ class kItemSet {
 
 
 public class AssociationRuleMining {
+    /*
+    * Main method class which reads the input data set and
+    * implements Apriori Algorithm for Association Rule Mining
+    */
 
-    private int minThresh;
-    private int numberOfTransactions;
+    private int minThresh;  // minimum threshold for the algorithm
+    private int numberOfTransactions;   // Total number of transactions
     private int biggestTransaction;
-    private Character[][] transactions;
-    private Set<kItemSet> priorSet = new HashSet<>();
-    private Set<kItemSet> laterSet = new HashSet<>();
-    private Set<Character> candidate_set = new HashSet<>();
+    private Character[][] transactions; // Array to store the transaction
+    private Set<kItemSet> priorSet = new HashSet<>();  // Hash set to store item set before the pass
+    private Set<kItemSet> laterSet = new HashSet<>(); // Hash set to store item set after the pass
+    private Set<Character> candidate_set = new HashSet<>(); // Hash set to store distinct item set
     private int outputToFile = 0;
 
     public static void main(String[] args) {
         String outputCheck;
         double start = 0, end;
-        String fileName, outputFilename = "processed_retail.txt";
+        String fileName, outputFilename = "processed_retail.txt"; // input data set file
         boolean check = true;
         AssociationRuleMining aRM = new AssociationRuleMining();
         String tmp;
@@ -52,7 +60,7 @@ public class AssociationRuleMining {
         while (check) {
             try {
                 System.out.print("Enter the minimum threshold (Integer) (Press enter for default:3) : ");
-                tmp = inputScanner.nextLine();
+                tmp = inputScanner.nextLine(); // get minimum threshold from the user
                 if (tmp.length() == 0)
                     aRM.setMinThresh(3);
                 else if (Integer.parseInt(tmp) <= 0)
@@ -67,22 +75,22 @@ public class AssociationRuleMining {
 
         BufferedReader bR = new BufferedReader(new InputStreamReader(System.in));
 
-        while (!check) {
+        while (!check) {   // other inputs from the user
             try {
                 System.out.print("Enter input file name: ");
-                fileName = bR.readLine();
+                fileName = bR.readLine();   // get input data set file from the user
                     if(fileName.length() < 1){
-                        fileName = "retail.txt";
-                        System.out.println("Reading from - retail.txt");
+                        fileName = "retail_transactions.txt";  //default
                     }
+                System.out.println("Reading from file- "+fileName);
                 System.out.print("Do you want to out in a file( N for console) ? Y/N : ");
                 outputCheck = bR.readLine();
                 if (outputCheck.equals("Y") || outputCheck.equals("y")) {
                     aRM.setOutputToFile(1);
                     System.out.print("Enter output file name(Press enter for default) : ");
-                    outputFilename = bR.readLine();
+                    outputFilename = bR.readLine();  // get output file from the user
                     if (outputFilename.length() < 1)
-                        outputFilename = "processed_retail.txt";
+                        outputFilename = "processed_retail.txt"; //default
                     System.out.println("Writing output to: " + outputFilename);
                 } else {
                     System.out.println("Printing output to console:");
@@ -95,7 +103,7 @@ public class AssociationRuleMining {
                 System.out.println("Bad Input File, please enter the file name again! ");
             }
         }
-        aRM.fillPriorSet();
+        aRM.fillPriorSet(); // filling prior hash set for the first pass
         if (aRM.getOutputToFile() == 1) {
             try {
                 FileWriter writeToFile = new FileWriter(outputFilename);
@@ -103,7 +111,7 @@ public class AssociationRuleMining {
                 if (aRM.getOutputToFile() == 1) {
                     bWrite.write("\n-----> INITIAL LIST <-----\n");
                     for (kItemSet t : aRM.getPriorSet()) {
-                        bWrite.write(t.itemset + " : " + t.support + "\n");
+                        bWrite.write(t.itemset + " : " + t.support + "\n");  // write the initial input transactions in the file
                     }
                 }
                 bWrite.flush();
@@ -114,11 +122,11 @@ public class AssociationRuleMining {
                 System.out.println("Please restart the program again: ");
             }
         } else {
-            aRM.coupleAndCount();
+            aRM.coupleAndCount(); // generate frequent item sets
         }
         end = System.nanoTime();
-        System.out.println("\n** Time taken to execute the program: " + (end - start) / 1000000000 + " seconds **");
-        System.out.println("\n** Memory Used: " + (Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) / (1024) + " KB **");
+        System.out.println("\n** Time taken to execute the program: " + (end - start) / 1000000000 + " seconds **"); // time taken during execution
+        System.out.println("\n** Memory Used: " + (Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) / (1024) + " KB **"); // memory used during execution
     }
 
     private void setMinThresh(int minThresh) {
@@ -137,6 +145,11 @@ public class AssociationRuleMining {
         return outputToFile;
     }
 
+    /*
+    * Method to read input from the file
+    * Input : filename of the input data set
+    * Return : -
+    */
     private void readInput(String fileName) throws IOException {
         String tmp;
         int i = 0, j;
@@ -160,6 +173,11 @@ public class AssociationRuleMining {
         bfR.close();
     }
 
+    /*
+    * Method to eliminate data items with frequency less than min support
+    * Input : number of the pass
+    * Return : -
+    */
     private void pruneAlgorithm(int i) {
         laterSet.clear();
         for (kItemSet t : priorSet) {
@@ -178,6 +196,11 @@ public class AssociationRuleMining {
         }
     }
 
+     /*
+    * Method to eliminate data items with frequency less than min support
+    * Input : number of the pass, buffer writer object
+    * Return : -
+    */
     private void pruneAlgorithm(int i, BufferedWriter bW) throws IOException {
         laterSet.clear();
         for (kItemSet t : priorSet) {
@@ -197,6 +220,11 @@ public class AssociationRuleMining {
         bW.flush();
     }
 
+     /*
+    * Method to generate frequent item sets after differnt passes
+    * Input : buffer writer object
+    * Return : -
+    */
     private void coupleAndCount(BufferedWriter bW) throws IOException {
         int passNumber = 0;
         boolean toBeContinued = true;
