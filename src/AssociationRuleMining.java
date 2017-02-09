@@ -71,6 +71,10 @@ public class AssociationRuleMining {
             try {
                 System.out.print("Enter input file name: ");
                 fileName = bR.readLine();
+                    if(fileName.length() < 1){
+                        fileName = "retail.txt";
+                        System.out.println("Reading from - retail.txt");
+                    }
                 System.out.print("Do you want to out in a file( N for console) ? Y/N : ");
                 outputCheck = bR.readLine();
                 if (outputCheck.equals("Y") || outputCheck.equals("y")) {

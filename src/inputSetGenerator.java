@@ -51,7 +51,7 @@ public class inputSetGenerator {
                 fCheck[i] = new FreqSet((char) (i + 65), (int) (zipF.getProbability(i + 1) * totalItems));
                 sum += fCheck[i].frequency;
             }
-            System.out.println("Total Items Freq:" + sum);
+           // System.out.println("Total Items Freq:" + sum);
 //            for(int i = 0;i< 26;i++){
 //                System.out.println(fCheck[i].toString());
 //            }
@@ -82,7 +82,7 @@ public class inputSetGenerator {
                 bufferW.flush();
                 tmp.setLength(0);
             }
-            System.out.println("Items Left now:" + returnSum(fCheck));
+//            System.out.println("Items Left now:" + returnSum(fCheck));
         } catch (IOException E) {
             System.out.println(E.toString());
         }
