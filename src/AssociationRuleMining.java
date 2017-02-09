@@ -47,15 +47,21 @@ public class AssociationRuleMining {
         String fileName, outputFilename = "processed_retail.txt";
         boolean check = true;
         AssociationRuleMining aRM = new AssociationRuleMining();
+        String tmp;
         Scanner inputScanner = new Scanner(System.in);
         while (check) {
             try {
-                System.out.print("Enter the minimum threshold: ");
-                aRM.setMinThresh(inputScanner.nextInt());
+                System.out.print("Enter the minimum threshold (Integer) (Press enter for default:3) : ");
+                tmp = inputScanner.nextLine();
+                if (tmp.length() == 0)
+                    aRM.setMinThresh(3);
+                else if (Integer.parseInt(tmp) <= 0)
+                    throw new ArithmeticException();
+                else
+                    aRM.setMinThresh(Integer.parseInt(tmp));
                 check = false;
-            } catch (InputMismatchException E) {
-                inputScanner.nextLine();
-                System.out.println("Please enter an Character ");
+            } catch (Exception E) {
+                System.out.println("Bad Input, Integer(>0) is required");
             }
         }
 
@@ -65,7 +71,7 @@ public class AssociationRuleMining {
             try {
                 System.out.print("Enter input file name: ");
                 fileName = bR.readLine();
-                System.out.print("Do you want to out in a file ? Y/N : ");
+                System.out.print("Do you want to out in a file( N for console) ? Y/N : ");
                 outputCheck = bR.readLine();
                 if (outputCheck.equals("Y") || outputCheck.equals("y")) {
                     aRM.setOutputToFile(1);
@@ -148,17 +154,6 @@ public class AssociationRuleMining {
             i++;
         }
         bfR.close();
-    }
-
-    private void printInput() {
-        System.out.println("List of transactions:");
-        for (int i = 0; i < numberOfTransactions; i++) {
-            System.out.print("T" + (i + 1) + ": ");
-            for (int j = 0; j < transactions[i].length; j++) {
-                System.out.print(transactions[i][j] + " ");
-            }
-            System.out.println();
-        }
     }
 
     private void pruneAlgorithm(int i) {
@@ -383,5 +378,4 @@ public class AssociationRuleMining {
 
     }
 }
-
 
