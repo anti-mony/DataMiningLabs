@@ -8,6 +8,14 @@ import java.util.Random;
 public class inputSetGenerator {
 
     public static void main(String[] args) {
+        /*
+        * Generates random transactions with each item frequency according to the zipF's law
+        * Requires
+        *   outputfileName<String>, noOfTransactions<integer>, maxItemsInEachTransaction<Integer> and
+        *   SkewFactor<Double(Fractional)>
+        * Generates
+        *   Output file with no of transactions decided transactions
+         */
         FileWriter fileW;
         BufferedWriter bufferW;
         int noOfInputs, maxItemTrans, maxTotalNumberOfItems, totalItems = 0, tmpChar, sum = 0, inLoopVarChck = 0;
@@ -51,10 +59,6 @@ public class inputSetGenerator {
                 fCheck[i] = new FreqSet((char) (i + 65), (int) (zipF.getProbability(i + 1) * totalItems));
                 sum += fCheck[i].frequency;
             }
-           // System.out.println("Total Items Freq:" + sum);
-//            for(int i = 0;i< 26;i++){
-//                System.out.println(fCheck[i].toString());
-//            }
 
             System.out.print("Enter the output file name (Press enter for default) : ");
             fileName = inpTaker.readLine();
