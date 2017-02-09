@@ -221,7 +221,7 @@ public class AssociationRuleMining {
     }
 
      /*
-    * Method to generate frequent item sets after differnt passes
+    * Method to generate frequent item sets after different passes
     * Input : buffer writer object
     * Return : -
     */
@@ -230,22 +230,22 @@ public class AssociationRuleMining {
         boolean toBeContinued = true;
         char element;
         int size = 1;
-        Set<Set<Character>> candidates = new HashSet<>();
-        pruneAlgorithm(++passNumber, bW);
+        Set<Set<Character>> candidates = new HashSet<>(); // hash set to store distinct data items
+        pruneAlgorithm(++passNumber, bW); // call to prune for the next pass
         while (toBeContinued) {
             candidates.clear();
             priorSet.clear();
-            kItemSet t1;
+            kItemSet t1; // data structure of kItemSet type
             Set<Character> temp;
-            Iterator<kItemSet> it2;
+            Iterator<kItemSet> it2; // for iteration over it2
             kItemSet t2;
             Iterator<Character> it3;
-            Character[] int_arr;
+            Character[] int_arr; // to store items in one transaction
             Set<Character> temp2;
             Set<Character> s;
             Iterator<Set<Character>> candidates_iterator;
             Iterator<kItemSet> iterator = laterSet.iterator();
-            while (iterator.hasNext()) {
+            while (iterator.hasNext()) { // while true keep iterating for maximum 5 passes
                 t1 = iterator.next();
                 temp = t1.itemset;
                 it2 = laterSet.iterator();
@@ -289,13 +289,18 @@ public class AssociationRuleMining {
         bW.flush();
     }
 
+    /*
+    * Method to generate frequent item sets after different passes
+    * Input : -
+    * Return : -
+    */
     private void coupleAndCount() {
         int passNumber = 0;
         boolean toBeContinued = true;
         char element;
         int size = 1;
-        Set<Set<Character>> candidates = new HashSet<>();
-        pruneAlgorithm(++passNumber);
+        Set<Set<Character>> candidates = new HashSet<>(); // Hash set for distinct data items
+        pruneAlgorithm(++passNumber); // call to prune for the next pass
         while (toBeContinued) {
             candidates.clear();
             priorSet.clear();
@@ -352,6 +357,11 @@ public class AssociationRuleMining {
         System.out.println("\n-----> Completed <-----");
     }
 
+    /*
+   * Method to generate frequency of items in the input set after
+   * Input : Set of data items
+   * Return : frequency
+   */
     private int count(Set<Character> inputSet) {
         int i, k;
         int support = 0;
@@ -379,6 +389,11 @@ public class AssociationRuleMining {
         return support;
     }
 
+    /*
+   * Method to generate frequency of items in the input set after
+   * Input : Set of data items
+   * Return : frequency
+   */
     private int frequencyCount(char c) {
         int count = 0;
         for (int i = 0; i < transactions.length; i++) {
@@ -391,6 +406,11 @@ public class AssociationRuleMining {
         return count;
     }
 
+    /*
+   * Method to generate items in the hashset for the first pass
+   * Input : -
+   * Return : -
+   */
     private void fillPriorSet() {
         Iterator<Character> iterator = candidate_set.iterator();
         char tmp;
