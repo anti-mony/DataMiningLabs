@@ -15,10 +15,10 @@ Output filename = "processed_retail.txt"
 
 
 Inputs from the user:
-Enter minimum threshold <Integer> :                
-Enter the input file name <String> :                                          
-Do you want to out in a file( N for console) ? Y/N : 
-Enter output file name <String> :                 
+Enter minimum threshold <Integer> :
+Enter the input file name <String> :
+Do you want to out in a file( N for console) ? Y/N :
+Enter output file name <String> :
 
 Output: 
 The datasets generated from the algorithm after different passes. (Either on console or specified/default file)
