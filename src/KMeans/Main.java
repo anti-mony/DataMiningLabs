@@ -22,11 +22,14 @@ public class Main {
         Main.args = args;
         if (args.length == 3) {
             start(args);
+
         }
         else{
             System.out.println("Usage: \n\tjava Main [dataset_file] [k] [output_filename]");
             System.exit(-1);
         }
+
+
 
     }
 
