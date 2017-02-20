@@ -1,3 +1,5 @@
+package AssociationRuleMining;
+
 import java.io.*;
 import java.util.*;
 
@@ -79,9 +81,9 @@ public class AssociationRuleMining {
             try {
                 System.out.print("Enter input file name: ");
                 fileName = bR.readLine();   // get input data set file from the user
-                    if(fileName.length() < 1){
-                        fileName = "retail_transactions.txt";  //default
-                    }
+                if (fileName.length() < 1) {
+                    fileName = "retail_transactions.txt";  //default
+                }
                 System.out.println("Reading from file- "+fileName);
                 System.out.print("Do you want to out in a file( N for console) ? Y/N : ");
                 outputCheck = bR.readLine();
@@ -133,16 +135,16 @@ public class AssociationRuleMining {
         this.minThresh = minThresh;
     }
 
-    private void setOutputToFile(int outputToFile) {
-        this.outputToFile = outputToFile;
-    }
-
     private Set<kItemSet> getPriorSet() {
         return priorSet;
     }
 
     private int getOutputToFile() {
         return outputToFile;
+    }
+
+    private void setOutputToFile(int outputToFile) {
+        this.outputToFile = outputToFile;
     }
 
     /*
@@ -196,11 +198,11 @@ public class AssociationRuleMining {
         }
     }
 
-     /*
-    * Method to eliminate data items with frequency less than min support
-    * Input : number of the pass, buffer writer object
-    * Return : -
-    */
+    /*
+   * Method to eliminate data items with frequency less than min support
+   * Input : number of the pass, buffer writer object
+   * Return : -
+   */
     private void pruneAlgorithm(int i, BufferedWriter bW) throws IOException {
         laterSet.clear();
         for (kItemSet t : priorSet) {
@@ -220,11 +222,11 @@ public class AssociationRuleMining {
         bW.flush();
     }
 
-     /*
-    * Method to generate frequent item sets after different passes
-    * Input : buffer writer object
-    * Return : -
-    */
+    /*
+   * Method to generate frequent item sets after different passes
+   * Input : buffer writer object
+   * Return : -
+   */
     private void coupleAndCount(BufferedWriter bW) throws IOException {
         int passNumber = 0;
         boolean toBeContinued = true;
@@ -235,7 +237,7 @@ public class AssociationRuleMining {
         while (toBeContinued) {
             candidates.clear();
             priorSet.clear();
-            kItemSet t1; // data structure of kItemSet type
+            kItemSet t1; // data structure of AssociationRuleMining.kItemSet type
             Set<Character> temp;
             Iterator<kItemSet> it2; // for iteration over it2
             kItemSet t2;

@@ -3,33 +3,21 @@ package KMeans;
 /**
  * Created by Sushant Bansal, Pragya Chaturvedi, Ishan Tyagi
  * K Means Clustering
- *
  */
 import java.io.*;
 import java.util.*;
 
-
 public class Main {
 
-    public static List<Point> data;
-    public static String[] args;
-    public static int k;
-    public static double sse = 0;
-    public static List<Cluster> clusterList;
-    public static int pointSize = 0;
-
+    static List<Point> data;
+    static String[] args;
+    static int k;
+    static double sse = 0, startTime = 0, endTime = 0;
+    static List<Cluster> clusterList;
+    static int pointSize = 0, noOfCLusters;
+    static String inputFile, ouputFile;
     public static void main(String[] args) throws IOException {
-        Main.args = args;
-        if (args.length == 3) {
-            start(args);
-
-        }
-        else{
-            System.out.println("Usage: \n\tjava Main [dataset_file] [k] [output_filename]");
-            System.exit(-1);
-        }
-
-
+        start(args);
     }
 
     /**
@@ -37,12 +25,64 @@ public class Main {
      * @param args arguments received
      * @throws FileNotFoundException
      */
-    public static void start(String[] args) throws FileNotFoundException {
-        data = convertData(args[0]);
+    static void start(String[] args) throws FileNotFoundException {
+        int iCheck = 0, oCheck = 0, kcheck = 0;
+        System.out.println("Executing...");
+        startTime = System.nanoTime();
+        if (args.length >= 2) {
+            if (args[0].equals("-f")) {
+                inputFile = args[1];
+                iCheck = 1;
+            } else if (args[0].equals("-o")) {
+                ouputFile = args[1];
+                oCheck = 1;
+            } else if (args[0].equals("-k")) {
+                noOfCLusters = Integer.parseInt(args[1]);
+                kcheck = 1;
+            }
+        }
+        if (args.length >= 4) {
+            if (args[2].equals("-f")) {
+                inputFile = args[3];
+                iCheck = 1;
+            } else if (args[2].equals("-o")) {
+                ouputFile = args[3];
+                oCheck = 1;
+            } else if (args[2].equals("-k")) {
+                noOfCLusters = Integer.parseInt(args[3]);
+                kcheck = 1;
+            }
+        }
+        if (args.length >= 6) {
+            if (args[4].equals("-f")) {
+                inputFile = args[5];
+                iCheck = 1;
+            } else if (args[4].equals("-o")) {
+                ouputFile = args[5];
+                oCheck = 1;
+            } else if (args[4].equals("-k")) {
+                noOfCLusters = Integer.parseInt(args[5]);
+                kcheck = 1;
+            }
+        }
 
-        //Receive k
+        if (kcheck != 1) {
+            noOfCLusters = 3;
+        }
+        if (oCheck != 1) {
+            ouputFile = "processed_data.txt";
+        }
+        if (iCheck != 1) {
+            inputFile = "climate_data.txt";
+        }
+        System.out.println("Input Params(else default): ");
+        System.out.println("No of Clusters: " + noOfCLusters);
+        System.out.println("Input Data Set: " + inputFile);
+        System.out.println("Output Data File: " + ouputFile);
+
+        data = convertData(inputFile);
         try{
-            k = Integer.parseInt(args[1]);
+            k = noOfCLusters;
             if (k <=0){
                 System.out.println("k must be an integer > 0");
                 System.exit(-1);
@@ -52,12 +92,8 @@ public class Main {
             System.exit(-1);
         }
 
-        //Create clusterList to store all the clusters
-        clusterList = new ArrayList<Cluster>();
-
-        //Shuffle dataSet to randomize
-        Collections.shuffle(data);
-
+        clusterList = new ArrayList<Cluster>(); //Create clusterList to store all the clusters
+        Collections.shuffle(data);          //Shuffle dataSet to randomize
         //Set random Centroids by taking the first k of the shuffled data
         for (int i = 0;i<k; i++) {
             Cluster cluster = new Cluster(i);
@@ -65,75 +101,38 @@ public class Main {
             cluster.setCentroid(centroid);
             clusterList.add(cluster);
         }
-        //Begin k-means clustering
         kMeans();
-
     }
 
     /**
      * Runs k-means clustering method
      */
-    public static void kMeans() {
-        boolean done = false;
-        int count = 0;
-
-        //
-        while(!done) {
-            //Reset clusters for the next iteration
-            resetClusters();
-
-            //Assign points to the closer cluster
-            assignPointsToClusters();
-
-            // Get the previous centroids and store to compare for later
-            List<Point> lastCentroids = getCentroids();
-
-            //Calculate new centroids and store them
-            calculateCentroids();
+    static void kMeans() {
+        boolean isCompleted = false;
+        int noOfIterations = 0;
+        while (!isCompleted) {
+            resetClusters();                //Reset clusters for the next iteration
+            assignPointsToClusters();             //Assign points to the closer cluster
+            List<Point> lastCentroids = getCentroids();             // Get the previous centroids and store to compare for later
+            calculateCentroids();             //Calculate new centroids and store them
             List<Point> currentCentroids = getCentroids();
-
             //Calculates total distance between new and old Centroids
             double distance = 0;
             for(int i = 0; i < lastCentroids.size(); i++) {
                 distance += Point.distance(lastCentroids.get(i),currentCentroids.get(i));
             }
-            // if distance is 0 then no change in centroids so we are done!
             if(distance == 0) {
-                done = true;
-
-                // calculate the SSE for quality measures
-                calculateQuality();
-                // print output file
-                printOutput(count);
-
+                isCompleted = true;                 // calculate the SSE for quality measures
+//                calculateQuality();                 // print output file
+                printOutput(noOfIterations);
             }
-
-            //Update count
-            count++;
-
+            noOfIterations++;
         }
     }
-
-    /**
-     * Calculates quality measures such as SSE through cohesion
-     */
-    public static void calculateQuality() {
-        double cohesion = 0;
-
-        for(Cluster cluster : clusterList) {
-            // calculate cohesion
-            for (Point point : cluster.getPoints()){
-                cohesion += point.getDistanceToCentroid();
-            }
-            cluster.setCohesion(cohesion);
-            sse+= cohesion;
-        }
-    }
-
     /**
      * Clears out all the Clusters points to reset
      */
-    public static void resetClusters() {
+    static void resetClusters() {
         for(Cluster cluster : clusterList) {
             cluster.clear();
         }
@@ -143,7 +142,7 @@ public class Main {
      * Returns centroids
      * @return List<Points> of all centroids
      */
-    public static List<Point> getCentroids() {
+    static List<Point> getCentroids() {
         List<Point> centroids = new ArrayList<Point>();
         for(Cluster cluster : clusterList) {
             Point cent = cluster.getCentroid();
@@ -156,7 +155,7 @@ public class Main {
     /**
      * Assigns Points to a cluster through its minimum centroid distance
      */
-    public static void assignPointsToClusters() {
+    static void assignPointsToClusters() {
         double max = Double.MAX_VALUE;
         double min;
         int clusterID = 0;
@@ -164,23 +163,17 @@ public class Main {
 
         // Go through each point and find its closets centroid
         for(Point point : data) {
-            // set min to max value to start off with
             min = max;
-
-            // compare the point to each of the centroids to find its closest
             for(int i = 0; i < k; i++) {
                 Cluster c = clusterList.get(i);
                 // find distance between the point and the centroid
                 distance = Point.distance(point, c.getCentroid());
-                // if distance < min the update min
                 if(distance < min){
                     min = distance;
                     clusterID = i;
                 }
             }
-            // add the point to the cluster
             clusterList.get(clusterID).addPoint(point);
-            // set distance between the point and the centroid
             point.setDistanceToCentroid(min);
         }
     }
@@ -188,60 +181,42 @@ public class Main {
     /**
      * Calculates new centroids by averaging all the Points of each cluster
      */
-    public static void calculateCentroids() {
+    static void calculateCentroids() {
         // Go through one cluster at a time
         for (Cluster cluster : clusterList) {
-            // maxType stores all the types of the points to later get the most prevalent type to assign to the centroid
-            HashMap<String, Integer> maxType = new HashMap<String, Integer>();
-
-            // avgPoints holds the new centroid values
-            ArrayList<Double> avgPoints = new ArrayList<Double>(Collections.nCopies(pointSize, 0.0));
-
+            // mostClosePoints stores all the types of the points to later get the most prevalent type to assign to the centroid
+            HashMap<String, Integer> mostClosePoints = new HashMap<>();
+            ArrayList<Double> averagedPoints = new ArrayList<>(Collections.nCopies(pointSize, 0.0)); // averagedPoints holds the new centroid values
             List<Point> list = cluster.getPoints();
             int listSize = list.size();
-
             for (Point point : list) {
-
-                // get the values
-                ArrayList<Double> values = point.getPoints();
+                ArrayList<Double> values = point.getPoints();   // get the values
                 // add all values of all the points
-
                 for (int i = 0; i < pointSize; i++) {
                     double x = values.get(i);
-
-                    // add to avgPoints
-                    avgPoints.set(i, avgPoints.get(i) + x);
-
-                    // updates maxType for the new type it sees
-                    /*
-                      For example, given : [Iris-virginica, 0]
-                        if the point is of type Iris-virginica then it updates the valaue to 1.
-                     */
-                    maxType.put(point.getType(), maxType.containsKey(point.getType()) ? maxType.get(point.getType()) + 1 : 1);
+                    // add to averagedPoints
+                    averagedPoints.set(i, averagedPoints.get(i) + x);
+                    // updates mostClosePoints for the new type it sees
+                    mostClosePoints.put(point.getType(), mostClosePoints.containsKey(point.getType()) ? mostClosePoints.get(point.getType()) + 1 : 1);
                 }
             }
-
             // Get the centroid of this cluster to update it
             Point centroid = cluster.getCentroid();
-
             // if there are no points in the cluster then no need to update
             if (listSize > 0) {
+                //average all the points and update averagedPoints
+                for (int i = 0; i < averagedPoints.size(); i++) {
 
-                //average all the points and update avgPoints
-                for (int i = 0; i < avgPoints.size(); i++) {
-
-                    avgPoints.set(i, (avgPoints.get(i)/listSize) );
+                    averagedPoints.set(i, (averagedPoints.get(i) / listSize));
                 }
-
                 // update centroid values
-                centroid.setPoints(avgPoints);
-
+                centroid.setPoints(averagedPoints);
                 // set the class to be the mode of the points in the cluster
                 int max = 0;
                 String maxClass = "";
-                for (String key : maxType.keySet()) {
-                    if (maxType.get(key) > max) {
-                        max = maxType.get(key);
+                for (String key : mostClosePoints.keySet()) {
+                    if (mostClosePoints.get(key) > max) {
+                        max = mostClosePoints.get(key);
                         maxClass = key;
                     }
                 }
@@ -249,7 +224,6 @@ public class Main {
             }
             // repeat for next cluster
         }
-
     }
 
 
@@ -257,11 +231,10 @@ public class Main {
      * Converts raw data to Points( ArrayList<Double>, String )
      * returns converted data to List<Point> form
      */
-    public static List<Point> convertData(String fileName) throws FileNotFoundException {
+    static List<Point> convertData(String fileName) throws FileNotFoundException {
         Scanner dataReader = new Scanner(new FileReader(fileName));
-        List<Point> dataSet = new ArrayList<Point>();
+        List<Point> dataSet = new ArrayList<>();
         ArrayList<Double> list;
-        StringTokenizer st = new StringTokenizer("this is a test");
         String type = "";
         boolean valid = false;
         while(dataReader.hasNextLine()){
@@ -295,7 +268,7 @@ public class Main {
         return dataSet;
     }
 
-    public static boolean isDouble(String value) {
+    static boolean isDouble(String value) {
         try {
             Double.parseDouble(value);
             return true;
@@ -307,22 +280,19 @@ public class Main {
 
     /**
      * Prints out the output file
-     * @param iterations number of iterations k-means ran
      */
-    public static void printOutput(int iterations) {
+    static void printOutput(int iterations) {
         //Print output of cluster results to output file
-        File f = new File(args[2]);
+        File f = new File(ouputFile);
         try {
             PrintWriter pw = new PrintWriter(f);
 
             pw.println("k: " + k);
-            pw.println("SSE: " + sse);
             pw.println("Iterations: " + iterations);
-            pw.println();
+            pw.println("*************");
 
             for (Cluster cluster : clusterList){
                 pw.println("Cluster: " + cluster.getId());
-                pw.println("Cohesion: "+ cluster.getCohesion());
                 pw.println("Size of Cluster: "+ cluster.getPoints().size() );
                 pw.println("Centroid: " + cluster.getCentroid());
                 pw.println("Points:");
@@ -332,10 +302,13 @@ public class Main {
                 pw.println();
             }
             pw.close();
+        } catch (FileNotFoundException E) {
+            System.out.println(E.toString());
         }
-        catch (FileNotFoundException ex) {
-            System.out.println(ex);
-        }
+        endTime = System.nanoTime();
+        System.out.println("** Completed  **");
+        System.out.printf("\n** Time taken to execute the program: %.2f seconds **", (endTime - startTime) / 1000000000); // time taken during execution
+        System.out.println("\n** Memory Used: " + (Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) / (1024 * 1024) + " MB **"); // memory used during execution
         System.exit(0);
     }
 }

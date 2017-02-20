@@ -6,7 +6,6 @@ import java.util.List;
 /**
  * Created by Sushant Bansal, Pragya Chaturvedi, Ishan Tyagi
  * K Means Clustering
- *
  */
 
 public class Cluster {
@@ -14,26 +13,16 @@ public class Cluster {
     private List<Point> points;
     private Point centroid;
     private int id;
-    private double cohesion = 0;
 
 
     public Cluster(int id) {
         this.id = id;
         this.points = new ArrayList<Point>();
         this.centroid = null;
-        this.cohesion = 0;
     }
 
     public int getId(){
         return id;
-    }
-
-    public double getCohesion(){
-        return cohesion;
-    }
-
-    public void setCohesion(double cohesion) {
-        this.cohesion = cohesion;
     }
 
     public List<Point> getPoints() {
@@ -54,6 +43,8 @@ public class Cluster {
 
     /**
      * Clears out the points to reset the Cluster
+     * @params none,
+     * @returns void.
      */
     public void clear() {
         points.clear();

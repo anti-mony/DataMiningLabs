@@ -1,10 +1,9 @@
 #importing dependencies
-import re
-import numpy as np
 import matplotlib.pyplot as plt
+import re
 
 #File Read - Input File Name = climate_out.txt
-with open('climate_out.txt') as f:
+with open('processed_data.txt') as f:
     file_read = f.readlines()
 
 #Variables Initialization
@@ -38,9 +37,10 @@ for line in file_read:
         a,b=re.findall("\d+\.\d+", line)
         upadte_elements(a, b, current_cluster+1)
 
+plt.figure(figsize=(10, 6), dpi=120)
 plt.scatter(x, y, c=color)
-plt.ylabel('Label_For_Y_Axis')
-plt.xlabel('Label_For_X_Axis')
-plt.savefig('ClusterVisualization.png')
-plt.title("K Means Cluster", fontsize='large')
+plt.ylabel('Y-Axis')
+plt.xlabel('X-Axis')
+plt.savefig('ClustersVisualization.png')
+plt.title("Clusters", fontsize='large')
 plt.show()

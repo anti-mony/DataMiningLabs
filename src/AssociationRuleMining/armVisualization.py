@@ -3,11 +3,8 @@
 #Ishan Tyagi 1410110164
 #Python Visualiser
 
-from os import path
-from PIL import Image
-import numpy as np
 import matplotlib.pyplot as plt
-from wordcloud import WordCloud, STOPWORDS
+from wordcloud import WordCloud
 
 # Read the whole text.
 tempText = open("processed_retail.txt")

@@ -4,7 +4,6 @@ import java.util.ArrayList;
 /**
  * Created by Sushant Bansal, Pragya Chaturvedi, Ishan Tyagi
  * K Means Clustering
- *
  */
 
 public class Point {
@@ -20,8 +19,20 @@ public class Point {
         this.distanceToCentroid = 0;
     }
 
-    public void setPoints(ArrayList<Double> x) {
-        this.points = x;
+    /**
+     * Calculates the distance between two points using Euclidean distance
+     *
+     * @param p<Point>,        a given Point
+     * @param centroid<Point>, to compare with a given Centroid
+     * @return distance<Double>, between the Point and the Centroid
+     */
+
+    protected static double distance(Point p, Point centroid) {
+        double sum = 0.0;
+        for (int i = 0; i < p.getPoints().size(); i++) {
+            sum += Math.pow((p.getPoints().get(i) - centroid.getPoints().get(i)), 2.0);
+        }
+        return Math.sqrt(sum);
     }
 
     public double getDistanceToCentroid(){
@@ -36,26 +47,16 @@ public class Point {
         return this.points;
     }
 
-    public void setType(String x) {
-        this.type = x;
+    public void setPoints(ArrayList<Double> x) {
+        this.points = x;
     }
 
     public String getType()  {
         return this.type;
     }
 
-    /**
-     * Calculates the distance between two points using Euclidean distance
-     * @param p a given Point
-     * @param centroid to compare with a given Centroid
-     * @return distance between the Point and the Centroid
-     */
-    protected static double distance(Point p, Point centroid) {
-        double sum = 0.0;
-        for(int i=0;i<p.getPoints().size();i++) {
-            sum += Math.pow( (p.getPoints().get(i) - centroid.getPoints().get(i)) , 2.0 );
-        }
-        return Math.sqrt(sum);
+    public void setType(String x) {
+        this.type = x;
     }
 
     public String toString() {
