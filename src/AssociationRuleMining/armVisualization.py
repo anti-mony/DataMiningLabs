@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 from wordcloud import WordCloud
 
 # Read the whole text.
-tempText = open("processed_retail.txt")
+tempText = open("processed_data.txt")
 freqCount = dict()
 for line in tempText:
 	if not line.startswith('['):

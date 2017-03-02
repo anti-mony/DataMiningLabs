@@ -35,7 +35,7 @@ for line in file_read:
     #Finding Co-ordinates of points within Cluster
     if '[' and ']' in line:
         a,b=re.findall("\d+\.\d+", line)
-        upadte_elements(a, b, current_cluster+1)
+        upadte_elements(a, b, (current_cluster + 1))
 
 plt.figure(figsize=(10, 6), dpi=120)
 plt.scatter(x, y, c=color)
