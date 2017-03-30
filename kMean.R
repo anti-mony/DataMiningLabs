@@ -1,0 +1,7 @@
+library(tidyverse)
+png("KMeansVisual.png",width=640,height=480)
+dat <- read.table("processed_data.txt")
+names(dat) = c("Latitude","Longitude","Cluster")
+ggplot(dat)+geom_point(mapping = aes(x=Latitude,y=Longitude,color=factor(Cluster)))
+#ggplot(dat)+geom_bar(mapping = aes(x=Cluster,fill=factor(Cluster)),width = 1) + coord_polar()
+dev.off()

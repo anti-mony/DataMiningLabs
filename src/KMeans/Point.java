@@ -60,13 +60,12 @@ public class Point {
     }
 
     public String toString() {
-        int i;
-        String out ="[ ";
+        int i, j = 0;
+        String out = "";
         for (i = 0; i<points.size(); i++){
-            out += ""+points.get(i)+",";
+            out += "" + points.get(i) + " ";
         }
-        out+="]";
-        out+= " "+type+"";
+//        out+="]";
         return out;
     }
 }

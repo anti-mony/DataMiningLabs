@@ -287,17 +287,17 @@ public class Main {
         try {
             PrintWriter pw = new PrintWriter(f);
 
-            pw.println("k: " + k);
-            pw.println("Iterations: " + iterations);
-            pw.println("*************");
+//            pw.println("k: " + k);
+//            pw.println("Iterations: " + iterations);
+//            pw.println("*************");
 
             for (Cluster cluster : clusterList){
-                pw.println("Cluster: " + cluster.getId());
-                pw.println("Size of Cluster: "+ cluster.getPoints().size() );
-                pw.println("Centroid: " + cluster.getCentroid());
-                pw.println("Points:");
+//                pw.println("Cluster: " + cluster.getId());
+//                pw.println("Size of Cluster: "+ cluster.getPoints().size() );
+//                pw.println("Centroid: " + cluster.getCentroid());
+//                pw.println("Points:");
                 for(Point p : cluster.getPoints()) {
-                    pw.println("\t"+p+"");
+                    pw.println("" + p + " " + (cluster.getId() + 1));
                 }
                 pw.println();
             }
@@ -309,6 +309,12 @@ public class Main {
         System.out.println("** Completed  **");
         System.out.printf("\n** Time taken to execute the program: %.2f seconds **", (endTime - startTime) / 1000000000); // time taken during execution
         System.out.println("\n** Memory Used: " + (Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) / (1024 * 1024) + " MB **"); // memory used during execution
-        System.exit(0);
+        try {
+            Runtime.getRuntime().exec("Rscript kMean.R");
+            Thread.sleep(1000);
+        } catch (IOException e) {
+        } catch (InterruptedException e) {
+        }
+//        System.exit(0);
     }
 }
