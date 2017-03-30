@@ -16,7 +16,8 @@ Usage:
 
 Profiling:
 ----------
-For input set of 300 points,
-Memory Used: 5.00 MB
-Time Taken: 0.2 seconds
 
+|Points| Memory(MB)| Time(s)|
+|:---: |   :---:   |  :---: |
+| 300  |  5.0      | 0.2    |
+|8000  |  30.0     |  0.68  |

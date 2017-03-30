@@ -311,7 +311,7 @@ public class Main {
         System.out.println("\n** Memory Used: " + (Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) / (1024 * 1024) + " MB **"); // memory used during execution
         try {
             Runtime.getRuntime().exec("Rscript kMean.R");
-            Thread.sleep(1000);
+            Thread.sleep(2000);
         } catch (IOException e) {
         } catch (InterruptedException e) {
         }

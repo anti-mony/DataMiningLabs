@@ -1,5 +1,5 @@
 library(tidyverse)
-png("KMeansVisual.png",width=640,height=480)
+jpeg("KMeansVisual.jpg",width=960,height=540,res = 150)
 dat <- read.table("processed_data.txt")
 names(dat) = c("Latitude","Longitude","Cluster")
 ggplot(dat)+geom_point(mapping = aes(x=Latitude,y=Longitude,color=factor(Cluster)))
