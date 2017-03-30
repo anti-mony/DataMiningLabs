@@ -8,7 +8,7 @@ Usage:
 
 -o : to specify output file name, default: processed_data.txt [String]
 
--i : to specify input file name, default: climate_data.txt [String]
+-f : to specify input file name, default: climate_data.txt [String]
 
 -k : to specify the number of clusters, default: 3 [Positive Integer]
 
