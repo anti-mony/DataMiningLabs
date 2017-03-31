@@ -23,6 +23,7 @@ Profiling:
 |8000  |  30.0     |  0.68  |
 
 
-####Dependencies:
+Dependencies:
+----
 1. JDK v1.8
 2. R v3.3   
