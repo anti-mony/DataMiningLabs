@@ -13,6 +13,8 @@ Usage:
 -k : to specify the number of clusters, default: 3 [Positive Integer]
 
 **if no options are specified then default the program uses default values.
+** Graphs are saved as <KMeansVisual1.png> & <KMeansVisual1.png>. 
+
 
 Profiling:
 ----------
