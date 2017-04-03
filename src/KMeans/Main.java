@@ -312,6 +312,7 @@ public class Main {
         try {
             Runtime.getRuntime().exec("Rscript kMean.R");
             Thread.sleep(2000);
+            System.out.println("Graphs Generated!");
         } catch (IOException e) {
         } catch (InterruptedException e) {
         }

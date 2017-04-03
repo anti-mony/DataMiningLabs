@@ -1,6 +1,6 @@
 library(ggplot2)
 library(RColorBrewer)
-cols <- colorRampPalette(brewer.pal(8, "Dark2"))
+cols <- colorRampPalette(brewer.pal(8, "Accent"))
 dat <- read.table("processed_data.txt")
 names(dat) = c("Latitude","Longitude","Cluster")
 maxC <- max(dat[3],na.rm =TRUE)
