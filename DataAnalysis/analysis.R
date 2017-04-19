@@ -762,5 +762,3 @@ server <- function(input, output,session) {
 remove(tmp1)
 remove(tmp2)
 runApp(list(ui = ui, server = server),host="127.0.0.1",port=5013, launch.browser = TRUE)
-
-
