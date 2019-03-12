@@ -1,7 +1,6 @@
 # US Air Quality Analysis
 # Sushant Bansal 1410110454
 # Pragya Chaturvedi 1410110289
-# Ishan Tyagi 1410110164
 
 library(tidyverse)
 library(shiny)
@@ -9,7 +8,7 @@ library(shinydashboard)
 library(plotly)
 library(treemap)
 library(data.tree)
-library(d3treeR)
+library(d3Tree)
 library(lubridate)
 
 data1 <- read.csv("annual_all_2000.csv")
@@ -34,8 +33,8 @@ subData5 <- data5[,c("Latitude","Longitude","Parameter.Name","Pollutant.Standard
                      "Units.of.Measure","Arithmetic.Mean","State.Name",
                      "County.Name","City.Name","Date.of.Last.Change")]
 
-partMatter1 <- filter(subData1,Parameter.Name == c("PM2.5 - Local Conditions"),Pollutant.Standard == c("PM25 24-hour 2013"))
-partMatter2 <- filter(subData2,Parameter.Name == c("PM2.5 - Local Conditions"),Pollutant.Standard == c("PM25 24-hour 2013"))
+partMatter1 <- filter(subData1,Parameter.Name == c("PM2.5 - Local Conditions"),Pollutant.Standard == c("PM25 24-hour 2012"))
+partMatter2 <- filter(subData2,Parameter.Name == c("PM2.5 - Local Conditions"),Pollutant.Standard == c("PM25 24-hour 2012"))
 partMatter3 <- filter(subData3,Parameter.Name == c("PM2.5 - Local Conditions"),Pollutant.Standard == c("PM25 24-hour 2012"))
 partMatter4 <- filter(subData4,Parameter.Name == c("PM2.5 - Local Conditions"),Pollutant.Standard == c("PM25 24-hour 2012"))
 partMatter5 <- filter(subData5,Parameter.Name == c("PM2.5 - Local Conditions"),Pollutant.Standard == c("PM25 24-hour 2012"))
@@ -51,10 +50,10 @@ names(stateData4) = c("State.Name","PM2.5Levels")
 names(stateData5) = c("State.Name","PM2.5Levels")
 
 ozone1 <- filter(subData1,Parameter.Name == c("Ozone"),Pollutant.Standard == c("Ozone 1-hour Daily 2005"))
-ozone2 <- filter(subData2,Parameter.Name == c("Ozone"),Pollutant.Standard == c("Ozone 1-hour Daily 2005"))
-ozone3 <- filter(subData3,Parameter.Name == c("Ozone"),Pollutant.Standard == c("Ozone 1-hour Daily 2005"))
-ozone4 <- filter(subData4,Parameter.Name == c("Ozone"),Pollutant.Standard == c("Ozone 1-hour Daily 2005"))
-ozone5 <- filter(subData5,Parameter.Name == c("Ozone"),Pollutant.Standard == c("Ozone 1-hour Daily 2005"))
+ozone2 <- filter(subData2,Parameter.Name == c("Ozone"),Pollutant.Standard == c("Ozone 1-hour 1979"))
+ozone3 <- filter(subData3,Parameter.Name == c("Ozone"),Pollutant.Standard == c("Ozone 1-hour 1979"))
+ozone4 <- filter(subData4,Parameter.Name == c("Ozone"),Pollutant.Standard == c("Ozone 1-hour 1979"))
+ozone5 <- filter(subData5,Parameter.Name == c("Ozone"),Pollutant.Standard == c("Ozone 1-hour 1979"))
 stOzone1 <- aggregate(ozone1[, c("Arithmetic.Mean")],list(ozone1$State.Name), mean) 
 stOzone2 <- aggregate(ozone2[, c("Arithmetic.Mean")],list(ozone2$State.Name), mean) 
 stOzone3 <- aggregate(ozone3[, c("Arithmetic.Mean")],list(ozone3$State.Name), mean) 
@@ -114,13 +113,11 @@ names(stMO3) <- c("State.Name","COLevels")
 names(stMO4) <- c("State.Name","COLevels")
 names(stMO5) <- c("State.Name","COLevels")
 
-
 cust_trans <- function(stateData){
   stateData$Hover <- with(stateData,paste(State.Name))
   stateData <- transform(stateData,
                          State.Name = state.abb[match(as.character(State.Name), state.name)])
 }
-
 stateData1 <- cust_trans(stateData1)
 stateData2 <- cust_trans(stateData2)
 stateData3 <- cust_trans(stateData3)
@@ -146,7 +143,6 @@ stMO2 <- cust_trans(stMO2)
 stMO3 <- cust_trans(stMO3)
 stMO4 <- cust_trans(stMO4)
 stMO5 <- cust_trans(stMO5)
-
 tmp1 <- stateData1
 names(tmp1) <- c("State.Name","Level","Hover")
 tmp2 <- stOzone1
@@ -162,6 +158,7 @@ tmp2 <- stMO1
 names(tmp2) <- c("State.Name","Level","Hover")
 yrAvDat1 <- rbind(yrAvDat1,tmp2)
 yrAvDat1 <- aggregate(yrAvDat1[, c("Level")],list(yrAvDat1$State.Name), mean)
+
 
 tmp1 <- stateData2
 names(tmp1) <- c("State.Name","Level","Hover")
@@ -243,14 +240,15 @@ names(tmp2) <- c("State.Name","Level","Hover")
 yrAvDat1 <- rbind(yrAvDat1,tmp2)
 yrAvDat1 <- aggregate(yrAvDat1[, c("Level")],list(yrAvDat1$State.Name), mean)
 
+
 ########################################## 2016
 histDF16 <- filter(data5,Parameter.Code == 44201 | Parameter.Code ==42401 | Parameter.Code ==42101 | Parameter.Code ==42602 |
                      Parameter.Code == 88101 | Parameter.Code == 81102)
+
 mymonths <- c("Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec")
-histDF16$month <- month(histDF16$X1st.Max.DateTime)
+histDF16$month <- month(as.POSIXlt(substr(histDF16$X1st.Max.DateTime,1,10), format="%Y-%m-%d"))
 mymonths <- factor(mymonths,levels = mymonths)
 histDF16$month <- mymonths[ histDF16$month ]
-
 # % of each pollutant per month
 plot16 <- ggplot(data = histDF16) + 
   geom_bar(mapping = aes(x = month , fill = Parameter.Name), position = "fill") +
@@ -261,7 +259,7 @@ plot16 <- ggplot(data = histDF16) +
 ########################################## 2000
 histDF00 <- filter(data1,Parameter.Code == 44201 | Parameter.Code ==42401 | Parameter.Code ==42101 | Parameter.Code ==42602 |
                      Parameter.Code == 88101 | Parameter.Code == 81102)
-histDF00$month <- month(histDF00$X1st.Max.DateTime)
+histDF00$month <- month(as.POSIXlt(substr(histDF00$X1st.Max.DateTime,1,10), format="%Y-%m-%d"))
 histDF00$month <- mymonths[ histDF00$month ]
 
 # % of each pollutant per month
@@ -272,11 +270,10 @@ plot00 <- plot00 + labs(title = "Percentage of Each Pollutant in Each Month",
                         y = "Precentage",
                         x = "Months",colour = "Pollutant")
 
-
 ########################################## 2004
 histDF04 <- filter(data2,Parameter.Code == 44201 | Parameter.Code ==42401 | Parameter.Code ==42101 | Parameter.Code ==42602 |
                      Parameter.Code == 88101 | Parameter.Code == 81102)
-histDF04$month <- month(histDF04$X1st.Max.DateTime)
+histDF04$month <- month(as.POSIXlt(substr(histDF04$X1st.Max.DateTime,1,10), format="%Y-%m-%d"))
 histDF04$month <- mymonths[ histDF04$month ]
 
 # % of each pollutant per month
@@ -287,11 +284,10 @@ plot04 <- plot04 + labs(title = "Percentage of Each Pollutant in Each Month",
                         y = "Precentage",
                         x = "Months",colour = "Pollutant")
 
-
 ########################################## 2008
 histDF08 <- filter(data3,Parameter.Code == 44201 | Parameter.Code ==42401 | Parameter.Code ==42101 | Parameter.Code ==42602 |
                      Parameter.Code == 88101 | Parameter.Code == 81102)
-histDF08$month <- month(histDF08$X1st.Max.DateTime)
+histDF08$month <- month(as.POSIXlt(substr(histDF08$X1st.Max.DateTime,1,10), format="%Y-%m-%d"))
 histDF08$month <- mymonths[ histDF08$month ]
 
 # % of each pollutant per month
@@ -302,12 +298,11 @@ plot08 <- plot08 + labs(title = "Percentage of Each Pollutant in Each Month",
                         y = "Precentage",
                         x = "Months",colour = "Pollutant")
 
-ggplotly(plot08)
+#ggplotly(plot08)
 ########################################## 2012
 histDF12 <- filter(data4,Parameter.Code == 44201 | Parameter.Code ==42401 | Parameter.Code ==42101 | Parameter.Code ==42602 |
                      Parameter.Code == 88101 | Parameter.Code == 81102)
-histDF12$X1st.Max.DateTime <- as.Date(histDF12$X1st.Max.DateTime)
-histDF12$month <- month(histDF12$X1st.Max.DateTime)
+histDF12$month <- month(as.POSIXlt(substr(histDF12$X1st.Max.DateTime,1,10), format="%Y-%m-%d"))
 histDF12$month <- mymonths[ histDF12$month ]
 histDF12 <- subset(histDF12,!is.na(month))
 
@@ -329,7 +324,6 @@ plot12 <- plot12 + labs(title = "Percentage of Each Pollutant in Each Month",
 #coordinates(location)=~Longitude+Latitude
 #projection(location)=CRS("+init=epsg:4326")
 #map <- plotGoogleMaps(location,zcol="Arithmetic.Mean",filename="EPA_GoogleMaps.html",layerName="EPA Stations")
-
 
 
 # GUI [Shiny, D3Tree, GoogleMaps]
@@ -426,7 +420,7 @@ ui <- dashboardPage(
       ),
       tabItem(tabName = "cPM25",
           fluidRow(
-            box(d3tree2Output("plot5",height = 400),width = 12),
+            box(d3treeOutput("plot5",height = 400),width = 12),
             box(
               sliderInput("slider5", "Choose Year", 2000, 2016, 2000,step = 4)
             )
@@ -434,7 +428,7 @@ ui <- dashboardPage(
       ),
       tabItem(tabName = "cOzone",
               fluidRow(
-                box(d3tree2Output("plot6",height = 400),width = 12),
+                box(d3treeOutput("plot6",height = 400),width = 12),
                 box(
                   sliderInput("slider6", "Choose Year", 2000, 2016, 2000,step = 4)
                 )
@@ -442,7 +436,7 @@ ui <- dashboardPage(
       ),
       tabItem(tabName = "cSO2",
               fluidRow(
-                box(d3tree2Output("plot7",height = 400),width = 12),
+                box(d3treeOutput("plot7",height = 400),width = 12),
                 box(
                   sliderInput("slider7", "Choose Year", 2000, 2016, 2000,step = 4)
                 )
@@ -450,7 +444,7 @@ ui <- dashboardPage(
       ),
       tabItem(tabName = "cNO2",
               fluidRow(
-                box(d3tree2Output("plot8",height = 400),width = 12),
+                box(d3treeOutput("plot8",height = 400),width = 12),
                 box(
                   sliderInput("slider8", "Choose Year", 2000, 2016, 2000,step = 4)
                 )
@@ -458,7 +452,7 @@ ui <- dashboardPage(
       ),
       tabItem(tabName = "cMO",
               fluidRow(
-                box(d3tree2Output("plot9",height = 400),width = 12),
+                box(d3treeOutput("plot9",height = 400),width = 12),
                 box(
                   sliderInput("slider9", "Choose Year", 2000, 2016, 2000,step = 4)
                 )
@@ -662,7 +656,7 @@ server <- function(input, output,session) {
   })
   
   
-  output$plot5 <- renderD3tree2({
+  output$plot5 <- renderD3tree({
     if(input$slider5 == 2000){
       partMatter <- partMatter1
     } else if(input$slider5 == 2004){
@@ -674,14 +668,13 @@ server <- function(input, output,session) {
     } else{
       partMatter <- partMatter5
     }
-    d3tree2(treemap(partMatter,index=c("State.Name","County.Name","City.Name"),
+    d3tree(treemap(partMatter,index=c("State.Name","County.Name","City.Name"),
                     vSize = "Arithmetic.Mean",
                     type = "value", palette = "YlOrRd",
                     fontsize.title = 8,fontsize.labels = 6,
-                    position.legend = "none"),
-            rootname = "Click to Zoom Out",height = "100%",width = "100%")
+                    position.legend = "none"),height = "100%",width = "100%")
   })
-  output$plot6 <- renderD3tree2({
+  output$plot6 <- renderD3tree({
     if(input$slider6 == 2000){
       ozone <- ozone1
     } else if(input$slider6 == 2004){
@@ -693,14 +686,13 @@ server <- function(input, output,session) {
     } else{
       ozone <- ozone5
     }
-    d3tree2(treemap(ozone,index=c("State.Name","County.Name","City.Name"),
+    d3tree(treemap(ozone,index=c("State.Name","County.Name","City.Name"),
                     vSize = "Arithmetic.Mean",
                     type = "value", palette = "Blues",
                     fontsize.title = 8,fontsize.labels = 6,
-                    position.legend = "none"),
-            rootname = "Click to Zoom Out",height = "100%",width = "100%")
+                    position.legend = "none"),height = "100%",width = "100%")
   })
-  output$plot7 <- renderD3tree2({
+  output$plot7 <- renderD3tree({
     if(input$slider7 == 2000){
       s02 <- s02_1
     } else if(input$slider7 == 2004){
@@ -712,14 +704,13 @@ server <- function(input, output,session) {
     } else{
       s02 <- s02_5
     }
-    d3tree2(treemap(s02,index=c("State.Name","County.Name","City.Name"),
+    d3tree(treemap(s02,index=c("State.Name","County.Name","City.Name"),
                     vSize = "Arithmetic.Mean",
                     type = "value", palette = "Oranges",
                     fontsize.title = 8,fontsize.labels = 6,
-                    position.legend = "none"),
-            rootname = "Click to Zoom Out",height = "100%",width = "100%")
+                    position.legend = "none"),height = "100%",width = "100%")
   })
-  output$plot8 <- renderD3tree2({
+  output$plot8 <- renderD3tree({
     if(input$slider8 == 2000){
       n02 <- n02_1
     } else if(input$slider8 == 2004){
@@ -731,14 +722,13 @@ server <- function(input, output,session) {
     } else{
       n02 <- n02_5
     }
-    d3tree2(treemap(n02,index=c("State.Name","County.Name","City.Name"),
+    d3tree(treemap(n02,index=c("State.Name","County.Name","City.Name"),
                     vSize = "Arithmetic.Mean",
                     type = "value", palette = "YlGnBu",
                     fontsize.title = 8,fontsize.labels = 6,
-                    position.legend = "none"),
-            rootname = "Click to Zoom Out",height = "100%",width = "100%")
+                    position.legend = "none"),height = "100%",width = "100%")
   })
-  output$plot9 <- renderD3tree2({
+  output$plot9 <- renderD3tree({
     if(input$slider9 == 2000){
       MO <- MO1
     } else if(input$slider9 == 2004){
@@ -750,12 +740,11 @@ server <- function(input, output,session) {
     } else{
       MO <- MO5
     }
-    d3tree2(treemap(MO,index=c("State.Name","County.Name","City.Name"),
+    d3tree(treemap(MO,index=c("State.Name","County.Name","City.Name"),
                     vSize = "Arithmetic.Mean",
                     type = "value", palette = "BuPu",
                     fontsize.title = 8,fontsize.labels = 6,
-                    position.legend = "none"),
-            rootname = "Click to Zoom Out",height = "100%",width = "100%")
+                    position.legend = "none"),height = "100%",width = "100%")
   })
     
 }
