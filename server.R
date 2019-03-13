@@ -298,6 +298,15 @@ plot08 <- plot08 + labs(title = "Percentage of Each Pollutant in Each Month",
                         y = "Precentage",
                         x = "Months",colour = "Pollutant")
 
+l <- list(color = toRGB("white"), width = 2)
+# specify some map projection/options
+g <- list(
+  scope = 'usa',
+  projection = list(type = 'albers usa'),
+  showlakes = FALSE,
+  lakecolor = toRGB('white')
+)
+
 #ggplotly(plot08)
 ########################################## 2012
 histDF12 <- filter(data4,Parameter.Code == 44201 | Parameter.Code ==42401 | Parameter.Code ==42101 | Parameter.Code ==42602 |
