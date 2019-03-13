@@ -4,7 +4,7 @@ Coursework for the Course Data Mining offered in Shiv Nadar University
 
 ### Capstone Air-Quality Analysis and Visualization 
 
-R script which generates interactive plots like choropleths, bar-graphs and treemaps using PlotlyR and D3R.  
+R script which generates interactive plots like choropleths, bar-graphs and treemaps using PlotlyR and D3R. [Live Here](https://antimony.shinyapps.io/datamininglabs/) 
 
 #### Extras:
 
